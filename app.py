@@ -1,73 +1,61 @@
 import streamlit as st
-from datetime import date, datetime
-import pandas as pd
-from streamlit_gsheets import GSheetsConnection
+from datetime import date
 
-# 頁面設定
-st.set_page_config(page_title="陳新退伍倒數計時", page_icon="💪")
-
-# 建立連線
-conn = st.connection("gsheets", type=GSheetsConnection)
+# 頁面基本設定
+st.set_page_config(page_title="陳新退伍倒數", page_icon="🪖")
 
 st.title("🪖 陳新退伍倒數計時")
 
-# 1. 倒數邏輯
-with st.expander("⚙️ 設定退伍日期"):
-    target_date = st.date_input("選擇退伍日：", date(2026, 6, 16))
-    total_days = st.number_input("總倒數天數：", value=36)
-
-days_left = (target_date - date.today()).days
-if days_left > 0:
-    st.metric(label="距離 陳新 自由還有", value=f"{days_left} 天")
-    st.progress(max(0.0, min(1.0, (total_days - days_left) / total_days)))
-else:
-    st.balloons()
+# --- 1. 妳每天要對他說的話 ---
+# 妳每天只要來 GitHub 改下面這段引號裡的文字，他重新整理網頁就會看到新留言
+st.chat_message("assistant").write("""
+💖 **今日老婆的話：** 陳新加油！今天也要想我喔，剩下不到一個月了，等妳回來我們去吃大餐！
+""")
 
 st.divider()
 
-# 2. 留言與紀錄
-st.subheader("💌 秘密留言板與體能紀錄")
+# --- 2. 倒數邏輯 ---
+target_date = date(2026, 6, 16) # 設定退伍日期
+total_days = 36                # 總倒數天數
+today = date.today()
+days_left = (target_date - today).days
 
-# 讀取資料
-try:
-    # 這裡明確指定工作表名稱，如果妳的是「工作表1」請改名
-    df = conn.read(worksheet="Sheet1", ttl="0") 
-    df = df.dropna(how="all")
-except:
-    df = pd.DataFrame(columns=['name', 'content', 'date'])
+if days_left > 0:
+    st.metric(label="距離自由還有", value=f"{days_left} 天")
+    # 進度條計算
+    progress = max(0.0, min(1.0, (total_days - days_left) / total_days))
+    st.progress(progress)
+    st.caption(f"目前的進度：{int(progress*100)}%")
+elif days_left == 0:
+    st.balloons()
+    st.success("🎉 就是今天！陳新退伍快樂！")
+else:
+    st.header("🎉 已經退伍囉！")
+    st.write(f"陳新已經自由 {-days_left} 天了！")
 
-with st.form("msg_form", clear_on_submit=True):
-    user = st.selectbox("你是誰？", ["女友 ❤️", "陳新 🪖"])
-    num = st.number_input("今天伏地挺身幾下？", min_value=0, step=1)
-    msg = st.text_area("想對對方說的話...")
-    submit = st.form_submit_button("送出紀錄與留言")
-    
-    if submit:
-        # 整理評價
-        eval_text = ""
-        if num >= 50: eval_text = f" (做了{num}下，超強🔥)"
-        elif num > 0: eval_text = f" (才{num}下，太廢了😒)"
-        
-        new_row = pd.DataFrame([{
-            "name": user,
-            "content": f"{msg}{eval_text}",
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M")
-        }])
-        
-        # 重新合併並寫入
-        updated_df = pd.concat([df, new_row], ignore_index=True)
-        # 這裡也明確指定 worksheet
-        conn.update(worksheet="Sheet1", data=updated_df)
-        st.success("紀錄成功！請重新整理網頁。")
-        st.cache_data.clear()
+st.divider()
 
-st.write("---")
-st.write("💬 **最近的 5 則紀錄：**")
+# --- 3. 體能簡單回應區 ---
+st.subheader("🏋️‍♂️ 每日體能簽到")
+num = st.number_input("今天伏地挺身做了幾下？", min_value=0, step=1)
 
-if not df.empty:
-    recent = df.tail(5).iloc[::-1]
-    for i, row in recent.iterrows():
-        st.info(f"**{row['name']}** ({row['date']})\n\n{row['content']}")
+if st.button("送出驗收"):
+    if num >= 50:
+        st.balloons()
+        st.success(f"🔥 {num} 下！太棒了，不愧是我的男人！")
+    elif num > 0:
+        # 這裡是妳要求的邏輯
+        st.error(f"😒 才 {num} 下？你很廢耶，給我去重做！")
+    else:
+        st.warning("趕快去運動，不要偷懶！")
+
+st.divider()
+st.caption("💡 溫馨提醒：這是一個簡單的倒數網頁，資料不會存檔，純粹用來互動喔！")
+
+
+
+
+     
 
 
 
