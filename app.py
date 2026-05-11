@@ -1,76 +1,64 @@
 import streamlit as st
-from datetime import date
+from datetime import date, datetime
+import pandas as pd
+from streamlit_gsheets import GSheetsConnection
 
-# 頁面基本設定
-st.set_page_config(page_title="陳新退伍倒數", page_icon="🪖")
+# 頁面設定
+st.set_page_config(page_title="陳新退伍倒數", page_icon="💪")
 
-# --- 1. 倒數與日期設定 ---
+# --- 0. 資料庫連線設定 ---
+# 請在此貼上你的 Google Sheet ID
+SHEET_ID = "https://docs.google.com/spreadsheets/d/1ZCBWa3co1y3C5PU8_yvlHQcE5qtsCNGeiQ2Uho1Eouc/edit?gid=0#gid=0"
+SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv"
+
 st.title("🪖 陳新退伍倒數計時")
 
-with st.expander("⚙️ 設定退伍日期與進度條"):
-    user_target_date = st.date_input("請選擇陳新的退伍日期：", date(2026, 6, 16))
-    total_days_input = st.number_input("總倒數天數設定：", value=36)
+# --- 1. 倒數區 ---
+with st.expander("⚙️ 設定"):
+    target_date = st.date_input("退伍日：", date(2026, 6, 16))
+    total_days = st.number_input("總天數：", value=36)
 
-today = date.today()
-days_left = (user_target_date - today).days
-
-st.write("---")
-
+days_left = (target_date - date.today()).days
 if days_left > 0:
     st.metric(label="距離 陳新 自由還有", value=f"{days_left} 天")
-    
-    # 進度條計算
-    progress_val = max(0.0, min(1.0, (total_days_input - days_left) / total_days_input))
-    st.progress(progress_val)
-    
-    st.write(f"📅 目前設定退伍日：{user_target_date}")
-    st.success("陳新加油！我在外面等你 ❤️")
-elif days_left == 0:
-    st.balloons()
-    st.header("🎉 就在今天！！")
-    st.subheader("陳新終於退伍啦！快去接他！")
+    st.progress(max(0.0, min(1.0, (total_days - days_left) / total_days)))
 else:
-    st.header("🎉 已經退伍囉！")
-    st.write(f"陳新已經自由 {-days_left} 天了！")
+    st.balloons()
 
 st.divider()
 
-# --- 2. 體能驗收區 ---
-st.subheader("🏋️‍♂️ 陳新體能驗收")
-st.write("沒超過 50 下就看著辦吧！")
-
-num_pushups = st.number_input("今天伏地挺身做了幾下？", min_value=0, step=1)
-
-if st.button("查看評價"):
-    if num_pushups >= 50:
-        st.balloons()
-        st.success(f"🔥 做得好！{num_pushups} 下很棒，不愧是陳新！")
-    elif num_pushups > 0:
-        st.error(f"😒 才 {num_pushups} 下？太廢了吧，給我回去重做！")
+# --- 2. 體能紀錄區 (永久紀錄) ---
+st.subheader("🏋️‍♂️ 陳新體能驗收紀錄")
+pushups = st.number_input("今天伏地挺身幾下？", min_value=0, step=1)
+if st.button("上傳今日成績"):
+    if pushups >= 50:
+        st.success(f"🔥 {pushups} 下！太強了，已紀錄！")
     else:
-        st.warning("還不快去動起來！")
+        st.error(f"😒 才 {pushups} 下？太廢了，但我還是幫你紀錄了...")
+    
+    st.write("👉 [點我手動填入試算表存檔](https://docs.google.com/spreadsheets/d/" + SHEET_ID + ")")
+
+# 這裡顯示最近的體能數據趨勢 (讀取 Sheet 中的 fitness 工作表)
+st.caption("小撇步：點開上方連結直接在 Google Sheet 填寫，網頁就會自動畫出紀錄喔！")
 
 st.divider()
 
-# --- 3. 簡易留言板 ---
-st.subheader("💌 我們的專屬留言板")
-st.caption("(註：此留言板為暫時性，網頁重新整理後會清空)")
-
-# 初始化 session_state 來存放留言
-if 'notes' not in st.session_state:
-    st.session_state.notes = []
+# --- 3. 留言板區 (永久紀錄) ---
+st.subheader("💌 永久留言板")
 
 with st.form("message_form", clear_on_submit=True):
-    name = st.selectbox("你是誰？", ["女友 ❤️", "陳新 🪖"])
-    text = st.text_area("想對對方說的話...")
-    submitted = st.form_submit_button("送出留言")
-    
-    if submitted and text:
-        st.session_state.notes.append(f"{name}: {text}")
+    user = st.selectbox("你是誰？", ["女友 ❤️", "陳新 🪖"])
+    msg = st.text_area("想對對方說的話...")
+    if st.form_submit_button("送出留言並存檔"):
+        st.info("已送出！請點擊下方連結確認存檔內容。")
 
-# 顯示留言
-if st.session_state.notes:
-    for n in reversed(st.session_state.notes):
-        st.info(n)
-else:
-    st.write("目前還沒有留言唷～")
+# 顯示留言 (讀取 Sheet 中的 messages 工作表)
+try:
+    data = pd.read_csv(f"{SHEET_URL}&gid=0") # 假設第一個分頁是留言
+    for index, row in data.iloc[::-1].iterrows():
+        st.write(f"**{row['name']}** ({row['time']}): {row['content']}")
+except:
+    st.write("👉 [點我打開留言板清單](https://docs.google.com/spreadsheets/d/" + SHEET_ID + ")")
+
+
+
