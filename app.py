@@ -1,30 +1,41 @@
 import streamlit as st
 from datetime import date
-import random
 
-# 頁面設定
-st.set_page_config(page_title="陳新退伍倒數計時", page_icon="💪")
+# 頁面基本設定
+st.set_page_config(page_title="陳新退伍倒數", page_icon="🪖")
 
 # --- 1. 倒數與日期設定 ---
 st.title("🪖 陳新退伍倒數計時")
 
-with st.expander("⚙️ 設定退伍日期"):
-    target_date = st.date_input("選擇退伍日：", date(2026, 6, 16))
-    total_countdown = st.number_input("設定倒數總天數：", value=36)
+with st.expander("⚙️ 設定退伍日期與進度條"):
+    user_target_date = st.date_input("請選擇陳新的退伍日期：", date(2026, 6, 16))
+    total_days_input = st.number_input("總倒數天數設定：", value=36)
 
 today = date.today()
-days_left = (target_date - today).days
+days_left = (user_target_date - today).days
+
+st.write("---")
 
 if days_left > 0:
     st.metric(label="距離 陳新 自由還有", value=f"{days_left} 天")
-    st.progress(max(0.0, min(1.0, (total_countdown - days_left) / total_countdown)))
-else:
+    
+    # 進度條計算
+    progress_val = max(0.0, min(1.0, (total_days_input - days_left) / total_days_input))
+    st.progress(progress_val)
+    
+    st.write(f"📅 目前設定退伍日：{user_target_date}")
+    st.success("陳新加油！我在外面等你 ❤️")
+elif days_left == 0:
     st.balloons()
-    st.header("🎉 恭喜陳新退伍！")
+    st.header("🎉 就在今天！！")
+    st.subheader("陳新終於退伍啦！快去接他！")
+else:
+    st.header("🎉 已經退伍囉！")
+    st.write(f"陳新已經自由 {-days_left} 天了！")
 
 st.divider()
 
-# --- 2. 體能驗收區 (妳要求的邏輯) ---
+# --- 2. 體能驗收區 ---
 st.subheader("🏋️‍♂️ 陳新體能驗收")
 st.write("沒超過 50 下就看著辦吧！")
 
@@ -41,12 +52,25 @@ if st.button("查看評價"):
 
 st.divider()
 
-# --- 3. 永久留言 (由妳手動在 GitHub 更新) ---
-st.subheader("💌 給陳新的話")
-# 妳只要在下面這行引號內改字，儲存後他那邊就會更新，永遠不會消失
-st.info("這 36 天我會一直陪著你，在外面等你回來 ❤️")
+# --- 3. 簡易留言板 ---
+st.subheader("💌 我們的專屬留言板")
+st.caption("(註：此留言板為暫時性，網頁重新整理後會清空)")
 
-# --- 4. 隨機加油小語 ---
-if st.button("點我領取今日份的鼓勵"):
-    cheers = ["你是最帥的！", "再撐一下就放假了", "加油，你是我的英雄", "回家人家幫你按摩"]
-    st.write(f"💖 **{random.choice(cheers)}**")
+# 初始化 session_state 來存放留言
+if 'notes' not in st.session_state:
+    st.session_state.notes = []
+
+with st.form("message_form", clear_on_submit=True):
+    name = st.selectbox("你是誰？", ["女友 ❤️", "陳新 🪖"])
+    text = st.text_area("想對對方說的話...")
+    submitted = st.form_submit_button("送出留言")
+    
+    if submitted and text:
+        st.session_state.notes.append(f"{name}: {text}")
+
+# 顯示留言
+if st.session_state.notes:
+    for n in reversed(st.session_state.notes):
+        st.info(n)
+else:
+    st.write("目前還沒有留言唷～")
