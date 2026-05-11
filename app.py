@@ -1,53 +1,52 @@
-
 import streamlit as st
 from datetime import date
+import random
 
-# 頁面基本設定
-st.set_page_config(page_title="陳新退伍倒數", page_icon="🪖")
+# 頁面設定
+st.set_page_config(page_title="陳新退伍倒數計時", page_icon="💪")
 
-# --- 1. 倒數邏輯 ---
-# 2026/5/11 距離 2026/6/16 剛好是 36 天
-target_date = date(2026, 6, 16)
+# --- 1. 倒數與日期設定 ---
+st.title("🪖 陳新退伍倒數計時")
+
+with st.expander("⚙️ 設定退伍日期"):
+    target_date = st.date_input("選擇退伍日：", date(2026, 6, 16))
+    total_countdown = st.number_input("設定倒數總天數：", value=36)
+
 today = date.today()
 days_left = (target_date - today).days
 
-st.title("🪖 陳新退伍倒數計時")
-st.write("---")
-
 if days_left > 0:
-    # 顯示大大的天數
-    st.metric(label="距離陳新自由還有", value=f"{days_left} 天")
-    
-    # 進度條 (以 36 天為最後衝刺期)
-    progress = max(0.0, min(1.0, (36 - days_left) / 36))
-    st.progress(progress)
-    
-    st.info(f"📅 預計退伍日：{target_date}")
-    st.success("陳新加油！這就是最後一哩路了，我在外面等你 ❤️")
+    st.metric(label="距離 陳新 自由還有", value=f"{days_left} 天")
+    st.progress(max(0.0, min(1.0, (total_countdown - days_left) / total_countdown)))
 else:
     st.balloons()
-    st.header("🎉 賀！陳新光榮退伍！")
-    st.subheader("終於等到這一天，自由萬歲！")
+    st.header("🎉 恭喜陳新退伍！")
 
-st.write("---")
+st.divider()
 
-# --- 2. 留言板功能 ---
-st.subheader("💌 我們的秘密留言板")
+# --- 2. 體能驗收區 (妳要求的邏輯) ---
+st.subheader("🏋️‍♂️ 陳新體能驗收")
+st.write("沒超過 50 下就看著辦吧！")
 
-# 使用 session_state 來暫存留言
-if 'notes' not in st.session_state:
-    st.session_state.notes = ["歡迎來到我們的秘密基地！"]
+num_pushups = st.number_input("今天伏地挺身做了幾下？", min_value=0, step=1)
 
-with st.form("message_form", clear_on_submit=True):
-    # 下拉選單選擇身分
-    name = st.selectbox("你是誰？", ["女友 ❤️", "陳新 🪖"])
-    text = st.text_area("想對對方說的話...")
-    submitted = st.form_submit_button("送出留言")
-    
-    if submitted and text:
-        # 將留言加進清單中
-        st.session_state.notes.append(f"{name}: {text}")
+if st.button("查看評價"):
+    if num_pushups >= 50:
+        st.balloons()
+        st.success(f"🔥 做得好！{num_pushups} 下很棒，不愧是陳新！")
+    elif num_pushups > 0:
+        st.error(f"😒 才 {num_pushups} 下？太廢了吧，給我回去重做！")
+    else:
+        st.warning("還不快去動起來！")
 
-# 顯示留言，最新的在最上面
-for n in reversed(st.session_state.notes):
-    st.write(n)
+st.divider()
+
+# --- 3. 永久留言 (由妳手動在 GitHub 更新) ---
+st.subheader("💌 給陳新的話")
+# 妳只要在下面這行引號內改字，儲存後他那邊就會更新，永遠不會消失
+st.info("這 36 天我會一直陪著你，在外面等你回來 ❤️")
+
+# --- 4. 隨機加油小語 ---
+if st.button("點我領取今日份的鼓勵"):
+    cheers = ["你是最帥的！", "再撐一下就放假了", "加油，你是我的英雄", "回家人家幫你按摩"]
+    st.write(f"💖 **{random.choice(cheers)}**")
