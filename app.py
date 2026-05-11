@@ -8,7 +8,7 @@ st.set_page_config(page_title="陳新退伍倒數", page_icon="💪")
 
 # --- 0. 資料庫連線設定 ---
 # 請在此貼上你的 Google Sheet ID
-SHEET_ID = "https://docs.google.com/spreadsheets/d/1ZCBWa3co1y3C5PU8_yvlHQcE5qtsCNGeiQ2Uho1Eouc/edit?gid=0#gid=0"
+SHEET_ID = "https://docs.google.com/forms/d/e/1FAIpQLScFEwz6QX81ZVt5PVyWrde5p7jzqObEmw69yImdtYUu0Jh7aQ/viewform?usp=header"
 SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv"
 
 st.title("🪖 陳新退伍倒數計時")
