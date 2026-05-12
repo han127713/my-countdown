@@ -15,7 +15,7 @@ st.title("🪖 陳新退伍倒數計時")
 
 # --- 1. 妳每天想對他說的話 ---
 st.chat_message("assistant").write("""
-💖 **今日老婆的話：** 倒數了不要偷懶，胖胖，繼續努力！ ❤️
+💖 **今日老婆的話：** 謝謝你喜歡這個網站，繼續努力！ ❤️
 """)
 
 st.divider()
@@ -64,7 +64,7 @@ trash_talk = ["😒 才做幾下？你是進去度假的嗎？", "🤮 這種體
 good_talk = ["🔥 帥喔！這肌肉我可以！", "🥰 猛男陳新回來了！", "💪 完美！期待看到你的八塊肌！"]
 
 if st.button("點我領取老婆評價"):
-    if num >= 50:
+    if num >= 100:
         st.balloons()
         st.success(random.choice(good_talk) + f" (紀錄：{num} 下)")
     elif num > 0:
