@@ -57,7 +57,7 @@ else:
 st.divider()
 
 # --- 4. 🏋️‍♂️ 區塊一：健身時間驗收 ---
-st.subheader("🏋️‍♂️ 區塊一：健身時間簽到")
+st.subheader("🏋️‍♂️ 運動一：健身時間簽到")
 workout_time = st.number_input("오늘 健身練了幾分鐘？", min_value=0, step=5, key="gym_time")
 
 trash_gym = [
@@ -84,7 +84,7 @@ if st.button("🏋️‍♂️ 送出健身時數驗收"):
 st.divider()
 
 # --- 5. 💪 區塊二：伏地挺身驗收 ---
-st.subheader("💪 區塊二：伏地挺身簽到")
+st.subheader("💪 運動二：伏地挺身簽到")
 pushups = st.number_input("오늘 伏地挺身做了幾下？", min_value=0, step=1, key="pushup_count")
 
 trash_push = [
