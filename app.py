@@ -15,7 +15,7 @@ st.title("🪖 陳新退伍倒數計時")
 
 # --- 1. 妳每天想對他說的話 ---
 st.chat_message("assistant").write("""
-💖 **今日老婆的話：** 今天是最胖胖回家的一天 ❤️ 既然你最近這麼愛健身，我就在下面開了一個巨巨專區，給我認真練，退伍我要驗收身材喔！
+💖 **今日老婆的話：** ❤️ 既然你最近這麼愛健身，我就在下面開了一個巨巨專區，給我認真練，退伍我要驗收身材喔！
 """)
 
 st.divider()
@@ -56,41 +56,68 @@ else:
 
 st.divider()
 
-# --- 4. 🏋️‍♂️ 升級版：陳新健身巨巨簽到區 ---
-st.subheader("🏋️‍♂️ 陳新軍中健身巨巨驗收")
+# --- 4. 🏋️‍♂️ 區塊一：健身時間驗收 ---
+st.subheader("🏋️‍♂️ 區塊一：健身時間簽到")
+workout_time = st.number_input("오늘 健身練了幾分鐘？", min_value=0, step=5, key="gym_time")
 
-# 讓男友輸入：健身時間 + 伏地挺身下數
-workout_time = st.number_input("🏋️‍♂️ 今天健身練了幾分鐘？", min_value=0, step=5)
-pushups = st.number_input("💪 伏地挺身做了幾下？", min_value=0, step=1)
-
-# 當他點擊送出時的隨機台詞
 trash_gym = [
-    "😒 練不到一個小時也敢叫健身巨巨？給我去重練！",
-    "🤮 才練這樣？退伍後我看你連大賣場的米袋都扛不動。",
+    "😒 練不到一小時也敢叫健身巨巨？給我去重練！",
     "👎 你這不是在健身，你是在健身房吹冷氣滑手機吧？",
-    "💀 練這幾分鐘？摸魚進度 100% 喔班長在看你。"
+    "💀 練這幾分鐘？摸魚進度 100% 喔，班長在看你。"
 ]
 
 good_gym = [
     "🔥 太猛了吧！練了 {time} 分鐘，胸肌快爆出來了嗎？",
-    "🥰 哇塞，做了 {push} 下伏地挺身！不愧是我的大肌肌男友！",
     "🚀 這麼拼！看來退伍後可以直接單手把我抱起來轉圈圈了！",
     "💪 完美！再接再厲，期待退伍看到你的魔鬼身材！"
 ]
 
-if st.button("點我領取老婆評價"):
-    if workout_time >= 60 or pushups >= 50:
+if st.button("🏋️‍♂️ 送出健身時數驗收"):
+    if workout_time >= 60:
         st.balloons()
-        # 隨機抽一句誇獎，並把他的時間和下數套進去
-        msg = random.choice(good_gym).format(time=workout_time, push=pushups)
-        st.success(f"{msg} \n\n (本日紀錄：健身 {workout_time} 分鐘 / 伏地挺身 {pushups} 下)")
-    elif workout_time > 0 or pushups > 0:
+        st.success(random.choice(good_gym).format(time=workout_time))
+    elif workout_time > 0:
         st.error(random.choice(trash_gym))
     else:
-        st.warning("你今天是不是根本沒去練？不要偷懶，快去運動！")
+        st.warning("你今天是不是根本沒去練時數？不要偷懶！")
+
+st.divider()
+
+# --- 5. 💪 區塊二：伏地挺身驗收 ---
+st.subheader("💪 區塊二：伏地挺身簽到")
+pushups = st.number_input("오늘 伏地挺身做了幾下？", min_value=0, step=1, key="pushup_count")
+
+trash_push = [
+    "🤮 才做幾下？退伍後我看你連大賣場的米袋都扛不動。",
+    "👎 你這不是伏地挺身，是在地板上蠕動吧？",
+    "😒 只有這樣？等你有 50 下再跟我炫耀！"
+]
+
+good_push = [
+    "🥰 哇塞，做了 {push} 下伏地挺身！不愧是我的大肌肌男友！",
+    "🔥 這個下數可以喔！今晚給你加雞腿！",
+    "👑 挺身巨巨是你！快讓我摸一下你的二頭肌！"
+]
+
+if st.button("💪 送出伏地挺身驗收"):
+    if pushups >= 50:
+        st.balloons()
+        st.success(random.choice(good_push).format(push=pushups))
+    elif pushups > 0:
+        st.error(random.choice(trash_push))
+    else:
+        st.warning("按按鈕前先去做伏地挺身！立刻！")
 
 st.divider()
 st.caption(f"📅 台灣今日日期：{today_tw} | 我是全世界最漂亮的女友 ❤️")
+
+
+
+
+
+
+
+ 
 
 
     
