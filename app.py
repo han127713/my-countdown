@@ -72,7 +72,7 @@ good_gym = [
     "💪 完美！再接再厲，期待退伍看到你的魔鬼身材！"
 ]
 
-if st.button("🏋️‍♂️ 送出健身時數驗收"):
+if st.button("🏋️‍♂️ 送出後得到老婆的獎勵"):
     if workout_time >= 60:
         st.balloons()
         st.success(random.choice(good_gym).format(time=workout_time))
@@ -99,7 +99,7 @@ good_push = [
     "👑 挺身巨巨是你！快讓我摸一下你的二頭肌！"
 ]
 
-if st.button("💪 送出伏地挺身驗收"):
+if st.button("💪 送出後得到老婆的獎勵"):
     if pushups >= 50:
         st.balloons()
         st.success(random.choice(good_push).format(push=pushups))
