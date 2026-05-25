@@ -90,7 +90,7 @@ pushups = st.number_input(" 伏地挺身做了幾下？", min_value=0, step=1, k
 trash_push = [
     "🤮 才做幾下？退伍後我看你連大賣場的米袋都扛不動。",
     "👎 你這不是伏地挺身，是在地板上蠕動吧？",
-    "😒 只有這樣？等你有 50 下再跟我炫耀！"
+    "😒 只有這樣？等你有 100 下再跟我炫耀！"
 ]
 
 good_push = [
@@ -100,7 +100,7 @@ good_push = [
 ]
 
 if st.button("💪 送出後得到老婆的獎勵"):
-    if pushups >= 50:
+    if pushups >= 100:
         st.balloons()
         st.success(random.choice(good_push).format(push=pushups))
     elif pushups > 0:
